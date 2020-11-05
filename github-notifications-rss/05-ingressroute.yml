@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: github-notifications-rss
+  namespace: github-notifications-rss
+  labels:
+    app.kubernetes.io/name: github-notifications-rss
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`github-notifications.skynewz.cloud`)
+      kind: Rule
+      services:
+        - name: github-notifications-rss
+          port: 8080

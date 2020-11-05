@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-ingress
+  namespace: kube-system
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "195.154.70.243"
+  selector:
+    app.kubernetes.io/name: traefik
+  ports:
+    - name: web
+      port: 80
+      targetPort: 8000
+    - name: websecure
+      port: 443
+      targetPort: 8443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+spec:
+  selector:
+    app.kubernetes.io/name: traefik
+  ports:
+    - name: traefik
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-metrics
+  namespace: kube-system
+spec:
+  selector:
+    app.kubernetes.io/name: traefik
+  ports:
+    - name: traefik
+      port: 9000
+      targetPort: 9000

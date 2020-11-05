@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghost-config
+  namespace: ghost
+  labels:
+    app.kubernetes.io/name: ghost
+data:
+  # URL to use to generate URL
+  url: https://blog.skynewz.cloud
+
+  # Mail sender
+  mail__from: "SkYNewZ Blog <noreply@blog.skynewz.cloud>"
+
+  # Bind
+  server__host: "0.0.0.0"
+  server__port: "2368"
+
+  # Misc
+  imageOptimization__resize: "true"

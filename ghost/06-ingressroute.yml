@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ghost
+  namespace: ghost
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`blog.skynewz.cloud`)
+      kind: Rule
+      services:
+        - name: ghost
+          port: 2368

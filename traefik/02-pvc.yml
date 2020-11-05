@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik-acme-storage-pvc
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: traefik
+spec:
+  storageClassName: scw-bssd-retain
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # Minimum required by Scaleway
+      storage: 1Gi

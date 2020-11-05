@@ -1,0 +1,44 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: feedly-backup
+  namespace: feedly-backup
+  labels:
+    app.kubernetes.io/name: feedly-backup
+spec:
+  schedule: "0 1 * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 5
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: feedly-backup
+          containers:
+            - name: feedly-backup
+              image: skynewz/feedly-backup:latest
+              imagePullPolicy: Always
+              envFrom:
+                - secretRef:
+                    name: feedly-backup-secret
+              volumeMounts:
+                - mountPath: /credentials
+                  name: restic-service-account
+                  readOnly: true
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /credentials/service_account_file.json
+              resources:
+                limits:
+                  memory: 128Mi
+                  cpu: 256m
+          restartPolicy: Never
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+          volumes:
+            - name: restic-service-account
+              secret:
+                secretName: restic-service-account

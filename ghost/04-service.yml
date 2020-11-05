@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ghost
+  namespace: ghost
+  labels:
+    app.kubernetes.io/name: ghost
+spec:
+  # Headless service
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: ghost
+  ports:
+    - name: ghost
+      port: 2368
+      targetPort: 2368

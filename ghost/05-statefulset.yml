@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: ghost
+  name: ghost
+  labels:
+    app.kubernetes.io/name: ghost
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ghost
+  serviceName: ghost
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ghost
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: ghost
+          image: docker.io/ghost:3.35.5-alpine
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: 500m
+          ports:
+            - containerPort: 2368
+              name: ghost
+          envFrom:
+            - configMapRef:
+                name: ghost-config
+            - secretRef:
+                name: ghost-config-secret
+          volumeMounts:
+            - name: ghost-data
+              mountPath: /var/lib/ghost/content
+          securityContext:
+            runAsGroup: 1000
+            runAsUser: 1000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 2368
+              httpHeaders:
+                - name: Host
+                  value: blog.skynewz.cloud
+                - name: X-Forwarded-Proto
+                  value: https
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 2368
+              httpHeaders:
+                - name: Host
+                  value: blog.skynewz.cloud
+                - name: X-Forwarded-Proto
+                  value: https
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+            successThreshold: 1
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: ghost
+      automountServiceAccountToken: false
+  volumeClaimTemplates:
+    - metadata:
+        name: ghost-data
+        namespace: ghost
+        labels:
+          app.kubernetes.io/name: ghost
+      spec:
+        storageClassName: scw-bssd
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
